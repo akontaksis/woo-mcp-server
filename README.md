@@ -491,14 +491,6 @@ https://shop.example.com/wp-json/wc/v3/orders?consumer_key=ck_...&consumer_secre
    - macOS: `~/Library/Logs/Claude/mcp-server-<name>.log`
 4. Δοκίμασε να τρέξεις χειροκίνητα: `node C:/path/to/index.js` — αν crashάρει, θα δεις το error
 
-### `unable to verify the first certificate` / `UNABLE_TO_VERIFY_LEAF_SIGNATURE`
-
-**Αιτία**: Ο WooCommerce server σερβίρει incomplete TLS chain — λείπει το intermediate certificate. Browsers το «μαντεύουν» μέσω AIA fetching, αλλά το Node.js όχι, οπότε το `fetch` σκάει πριν φτάσει στο API.
-
-Ο [lib/woocommerce.js](lib/woocommerce.js) χρησιμοποιεί ήδη `node-fetch` με custom `https.Agent({ rejectUnauthorized: false })` σαν workaround, ώστε ο MCP server να δουλεύει ακόμη και με incomplete chain στο hosting. Παρακάμπτεται **μόνο** η επαλήθευση του chain για τις κλήσεις στο WooCommerce — όχι globally.
-
-**Σωστό fix (όταν είναι δυνατό)**: στον web server του store να εγκατασταθεί full chain certificate (π.χ. `fullchain.pem` αντί για μόνο `cert.pem`). Όταν φτιαχτεί το cert, το workaround μπορεί να αφαιρεθεί.
-
 ### `WC API error 5xx`
 
 Server-side σφάλμα στο WooCommerce. Δες τα WP debug logs (`wp-content/debug.log`) και τα server error logs. Συχνές αιτίες:
